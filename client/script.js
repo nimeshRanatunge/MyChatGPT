@@ -39,3 +39,54 @@ function generateUniqueId() {
 
     return `id-${timestamp}-${hexadecimalString}`;
 }
+
+function chatStripe (isAi, value, uniqueId) {
+    return (
+        `
+        <div class="wrapper ${isAi && 'ai'}">
+            <div class="chat">
+                <div className="Profile">
+                    <img
+                        src="${isAi ? bot: user}"
+                        alt="${isAi ? 'bot' : 'user'}"
+                    />
+                </div>
+                <div class="message" id=${uniqueId}>${value}</div>
+            </div>
+        </div>
+        `
+    )
+} 
+
+const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const data = new FormData(form)
+
+    // user's chatstripe
+    chatContainer.innerHTML += chatStripe(false, data.get('prompt'))
+
+    // to clear the textarea input 
+    form.reset()
+
+    // bot's chatstripe
+    const uniqueId = generateUniqueId()
+    chatContainer.innerHTML += chatStripe(true, " ", uniqueId)
+
+    // to focus scroll to the bottom 
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // specific message div 
+    const messageDiv = document.getElementById(uniqueId)
+
+    // messageDiv.innerHTML = "..."
+    loader(messageDiv)
+}
+
+// 13 - enter key
+form.addEventListener('submit', handleSubmit)
+form.addEventListener('keyup', (e) => {
+    if (e.keyCode === 13) {
+        handleSubmit(e)
+    }
+})
